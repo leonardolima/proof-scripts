@@ -1,0 +1,14 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% Reasoning about simple imperative programs
+
+Specification "imp".
+
+Theorem silly : forall AE1 AE2,
+  { aeval AE1 AE2 } -> { aeval AE1 AE2 }.
+intros. case H1.
+  search.
+  search.
+
+
+
