@@ -27,6 +27,6 @@ type sum    nat -> nat -> nat -> o.
 type sub    nat -> nat -> nat -> o.
 
 % Evaluation
-type aeval  aexp -> aexp -> o.
+type aeval  aexp -> nat -> o.
 type beval  bexp -> o -> o.
 type val    aexp -> o.

@@ -19,6 +19,13 @@ sub (s N1) (s N2) N3 :- sub N1 N2 N3.
 % Values
 val (anum N) :- nat N.
 
-% Evaluation
-aeval (anum N) (anum N) :- nat N.
-aeval (aplus A1 A2) (anum N) :- aeval A1 (anum N1), aeval A2 (anum N2), sum N1 N2 N.
+% Arithmetic evaluation (without multiplication)
+aeval (anum N) N.
+aeval (aplus A1 A2) N :- aeval A1 N1, aeval A2 N2, sum N1 N2 N.
+aeval (aminus A1 A2) N :- aeval A1 N1, aeval A2 N2, sub N1 N2 N.
+
+% Boolean evaluation
+% beval btrue.
+% beval bfalse.
+% beval (bnot B1) :- (beval B1).
+% beval (band B1 B2) :- (beval B1), (beval B2).

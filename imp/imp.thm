@@ -2,13 +2,19 @@
 %%
 %% Reasoning about simple imperative programs
 
+Set instantiations on.
+Set witnesses on.
+Set subgoals on.
+
 Specification "imp".
 
-Theorem silly : forall AE1 AE2,
-  { aeval AE1 AE2 } -> { aeval AE1 AE2 }.
-intros. case H1.
-  search.
-  search.
+Theorem silly : { aeval (aplus (anum (s z)) (anum (s z))) (s (s (s z))) } -> false.
+  intros. case H1.
+    case H2. case H3.
+    case H4. case H5.
 
-
-
+Theorem silly2 : { aeval (aminus (anum (s (s z))) (anum (s z))) (s z) } -> true.
+  intros. case H1.
+    case H2. case H3.
+    case H4. case H5.
+    search.
