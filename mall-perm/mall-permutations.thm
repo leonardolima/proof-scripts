@@ -1,0 +1,132 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                    %%
+%%       MALL specification in        %%
+%%       Abella (.thm)                %%
+%%                                    %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% More verbose output
+Set instantiations on.
+Set witnesses on.
+Set subgoals off.
+
+Type a, b, c, d                o.
+Type tensor, par, plus, with   o -> o -> o.
+Type one, bot, zero, top       o.
+Type not, atom                 o -> o.
+
+Define formula : o -> prop by
+  formula (tensor A B) := formula A /\ formula B ;
+  formula (plus A B) := formula A /\ formula B ;
+  formula (with A B) := formula A /\ formula B ;
+  formula (par A B) := formula A /\ formula B ;
+  formula (zero) ; 
+  formula (one) ; 
+  formula (bot) ;
+  formula (top) ; 
+  formula (atom A).
+
+Import "../lib/merge" with is_o := formula.
+
+Define prove : olist -> olist -> prop by
+  % 1. Identity
+  prove G D := exists A, adj nil (atom A) G /\ adj nil (atom A) D ;
+
+  % Multiplicative rules
+  % 2. oneR
+  prove G D := G = nil /\ adj nil one D ;
+  % 3. oneL
+  prove G D := exists G', adj G' one G /\ prove G' D ;
+  % 4. tensorL
+  prove G D := exists A B G' G1 G2, 
+    adj G' (tensor A B) G /\ adj G2 A G1 /\ adj G' B G2 /\ prove G1 D ;
+  % 5. tensorR
+  prove G D := exists A B D' D1 D2 D1' D2' G1 G2, 
+    adj D' (tensor A B) D /\ merge D1' D2' D' /\ merge G1 G2 G /\ 
+    adj D1' A D1 /\ adj D2' B D2 /\ prove G1 D1 /\ prove G2 D2 ;
+  % 6. botL
+  prove G D := D = nil /\ adj nil bot G ;
+  % 7. botR
+  prove G D := exists D', adj D' bot D /\ prove G D' ;
+  % 8. parR
+  prove G D := exists A B D' D1 D2, 
+    adj D' (par A B) D /\ adj D2 A D1 /\ adj D' B D2 /\ prove G D1 ;
+  % 9. parL
+  prove G D := exists A B G' G1 G2 G1' G2' D1 D2, 
+    adj G' (par A B) G /\ merge G1' G2' G' /\ merge D1 D2 D /\ adj G1' A G1 /\ 
+    adj G2' B G2 /\ prove G1 D1 /\ prove G2 D2 ;
+
+  % Additive rules
+  % 10. zeroL
+  prove G D := exists G', adj G' zero G /\ is_list D ;
+  % 11. topR
+  prove G D := exists D', adj D' top D /\ is_list G ;
+  % 12. withL1
+  prove G D := exists A B G' G1, 
+    adj G' (with A B) G /\ adj G' A G1 /\ prove G1 D ; 
+  % 13. withL2
+  prove G D := exists A B G' G1, 
+    adj G' (with A B) G /\ adj G' B G1 /\ prove G1 D ;
+  % 14. withR
+  prove G D := exists A B D' D2' D1 D2 G1 G2,
+    adj D' (with A B) D /\ adj D' A D1 /\ adj D2' B D2 /\ prove G1 D1 /\ prove G2 D2 /\
+    perm D2' D' /\ perm G1 G /\ perm G2 G ;
+  % 15. plusR1
+  prove G D := exists A B D' D1, 
+    adj D' (plus A B) D /\ adj D' A D1 /\ prove G D1 ;
+  % 16. plusR2
+  prove G D := exists A B D' D1, 
+    adj D' (plus A B) D /\ adj D' B D1 /\ prove G D1 ;
+  % 17. plusL
+  prove G D := exists A B G' G2' G1 G2 D1 D2, 
+    adj G' (plus A B) G /\ adj G' A G1 /\ adj G2' B G2 /\ prove G1 D1 /\ prove G2 D2 /\
+    perm G2' G' /\ perm D1 D /\ perm D2 D.
+
+Theorem tensor_l_over_tensor_l : forall A1 B1 A2 B2 G G1 G2 G3 G4 G5 G6 G7 G8 G9 D,
+  (adj G8 A1 G9 /\ adj G7 B1 G8 /\ adj G6 A2 G7 /\ adj G B2 G6 /\ prove G9 D /\
+  adj G4 A1 G5 /\ adj G3 B1 G4 /\ adj G (tensor A2 B2) G3 /\ prove G5 D /\
+  adj G1 (tensor A1 B1) G2 /\ adj G (tensor A2 B2) G1 /\ prove G2 D) 
+  ->
+  (exists G1 G2 G3 G4 G5 G6 G7 G8 G9,
+  adj G8 A1 G9 /\ adj G7 B1 G8 /\ adj G6 A2 G7 /\ adj G B2 G6 /\ prove G9 D /\
+  adj G4 A2 G5 /\ adj G3 B2 G4 /\ adj G (tensor A1 B1) G3 /\ prove G5 D /\
+  adj G1 (tensor A2 B2) G2 /\ adj G (tensor A1 B1) G1 /\ prove G2 D).
+
+intros. case H1.
+  % Second sequent -- we need to build a new sequent, where the second tensor is applied first
+  apply adj_swap to H12 H11.
+  apply adj_3_is_list to H14.
+  apply adj_2_is_o to H4.
+  apply adj_2_is_o to H5.
+  apply adj_exists to H18 H16.
+  apply adj_3_is_list to H19.
+  apply adj_exists to H17 H20.
+
+  % First sequent (conclusion) -- change the order of tensor_1 and tensor_2
+  apply adj_swap to H12 H11.
+
+  % Witnesses
+  exists U1. exists G2. exists U. exists M. exists M1.
+  exists G6. exists G7. exists G8. exists G9.
+  split.
+
+  % First case (conclusion) -- trivial
+  search.
+  search.
+  search.
+  search.
+  search.
+
+  % Second case -- apply new hypothesis
+  search.
+  search.
+  search.
+  unfold 4.
+  apply adj_
+  exists A1. exists B1. exists G. exists 
+  skip.
+
+  % Third case -- trivial
+  search.
+  search.
+  search.
